@@ -87,46 +87,40 @@ dayjs.extend(window.dayjs_plugin_timezone);
                     heading.textContent = '5 Day Forecast';
                     headingFive.append(heading);
                     
-                    var startDate = dayjs().add(1, 'day').format("M/D/YYYY");
-                    console.log(startDate);
-                    var endDate = dayjs().add(5, 'day').format("M/D/YYYY");
-                    console.log(endDate);
-                
-                
-                    var newCard= $("<div>").attr("class", "card col-sm-2","background-color:rgb(60, 60, 109)");
-                    fiveDay.append(newCard);
-                    newCard.append($("<h4>").html(date++));
-                    newCard.append($("<p>").html("Temp: " ));
-                    newCard.append($("</p>").html("Wind: "));
-                    newCard.append($("<p>").html("Humidity: "));
-                    var temp = data.daily[1].temp.day;
-                    console.log(temp);
-                        
-                        var humidity  = data.daily[1].humidity;
-                        var windMph = data.daily[1].wind_speed;
-                        var weatherIcon = data.daily[1].weather[0].icon;
-            
-                        // Create elements for a card
-                        var col = document.createElement('div');
+                   
+                    
+                    for(i = 0; i < 5; i++) {
                         var card = document.createElement('div');
+                        
+                        var unixTs = data.dt;
+                        var forecastDate = dayjs().add(i, 'day').format('M/D/YYYY');
+                         console.log(forecastDate);
+                        
+                        var humidity  = data.daily[i].humidity;
+                        var windMph = data.daily[i].wind_speed;
+                        var weatherIcon = data.daily[i].weather[0].icon;
+                        //var day = data.daily[i].daily.dt;
+
+                        var col = document.createElement('div');
                         var cardBody = document.createElement('div');
                         var cardTitle = document.createElement('h5');
                         var weatherIcon = document.createElement('img');
                         var tempEl = document.createElement('p');
                         var windEl = document.createElement('p');
                         var humidityEl = document.createElement('p');
-                    
+                        var dayEL = document.createElement('h1');
                         
-                        
+   
                         col.setAttribute('class', 'col-md');
                         col.classList.add('five-day-card');
-                        card.setAttribute('class', 'card bg-primary h-100 text-white');
+                        card.setAttribute('class', 'card bg-primary col is-full is-flex h-100 text-white');
                         cardBody.setAttribute('class', 'card-body p-2');
                         cardTitle.setAttribute('class', 'card-title');
                         tempEl.setAttribute('class', 'card-text');
                         windEl.setAttribute('class', 'card-text');
                         humidityEl.setAttribute('class', 'card-text');
                         weatherIcon.setAttribute('src', iconUrl);
+                        cardTitle.textContent = `Date: ${forecastDate}`;
                         tempEl.textContent = `Temp: ${temp} °F`;
                         windEl.textContent = `Wind: ${windMph} MPH`;
                         humidityEl.textContent = `Humidity: ${humidity} %`;
@@ -137,13 +131,13 @@ dayjs.extend(window.dayjs_plugin_timezone);
                     
         
                         fiveDay.innerHTML = "";
-                        fiveDay.append(card);
+                        fiveDay.append(col);
 
-                    });
+                    };
                                 
                             } )            //renderForecastCard(data);
-
-                            };
+                        });
+    }     
                             
                         
                         
