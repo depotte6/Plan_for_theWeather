@@ -5,7 +5,6 @@ var searchHistory = [];
 var searchForm = document.querySelector('#search-form');
 var searchCityInput = document.querySelector('#search-input');
 var todayDisplay = document.querySelector('#today');
-var futureDisplay = document.querySelector('#future');
 var searchHistoryDisplay= document.querySelector('#history');
 var fiveDay = document.querySelector('#future');
 
@@ -73,31 +72,82 @@ dayjs.extend(window.dayjs_plugin_timezone);
                 var lon = data.coord.lon;
                 console.log(lon);
            
-                var apiUrl = `${weatherRootUrl}/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${APIKey}`;
+                var apiUrl = `${weatherRootUrl}/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,current,alerts&units=imperial&appid=${APIKey}`;
               
                 fetch(apiUrl)
-            .then(function (res) {
-                console.log(res);
-                return res.json();
-            })
-                renderForecastCard(data);
-            
-            /*.then(function(data) {
+                .then(function (data) {
 
-                console.log(data);
-                var newCard= $("<div>").attr("class", "card col-sm-2","background-color:rgb(60, 60, 109)");
-                fiveDay.append(newCard);
-                newCard.append($("<h4>").html(date++));
-                newCard.append($("<p>").html("Temp: " ));
-                newCard.append($("</p>").html("Wind: "));
-                newCard.append($("<p>").html("Humidity: "));
+                    return data.json();
+                })
+                .then(function(data) {
+                    console.log(data);
+                    var headingFive = document.createElement('div');
+                    var heading = document.createElement('div');
+                    headingFive.setAttribute('class', 'col-12');
+                    heading.textContent = '5 Day Forecast';
+                    headingFive.append(heading);
+                    
+                    var startDate = dayjs().add(1, 'day').format("M/D/YYYY");
+                    console.log(startDate);
+                    var endDate = dayjs().add(5, 'day').format("M/D/YYYY");
+                    console.log(endDate);
+                
+                
+                    var newCard= $("<div>").attr("class", "card col-sm-2","background-color:rgb(60, 60, 109)");
+                    fiveDay.append(newCard);
+                    newCard.append($("<h4>").html(date++));
+                    newCard.append($("<p>").html("Temp: " ));
+                    newCard.append($("</p>").html("Wind: "));
+                    newCard.append($("<p>").html("Humidity: "));
+                    var temp = data.daily[1].temp.day;
+                    console.log(temp);
+                        
+                        var humidity  = data.daily[1].humidity;
+                        var windMph = data.daily[1].wind_speed;
+                        var weatherIcon = data.daily[1].weather[0].icon;
             
-            })*/
-            });
-
-            };
-            
+                        // Create elements for a card
+                        var col = document.createElement('div');
+                        var card = document.createElement('div');
+                        var cardBody = document.createElement('div');
+                        var cardTitle = document.createElement('h5');
+                        var weatherIcon = document.createElement('img');
+                        var tempEl = document.createElement('p');
+                        var windEl = document.createElement('p');
+                        var humidityEl = document.createElement('p');
+                    
+                        
+                        
+                        col.setAttribute('class', 'col-md');
+                        col.classList.add('five-day-card');
+                        card.setAttribute('class', 'card bg-primary h-100 text-white');
+                        cardBody.setAttribute('class', 'card-body p-2');
+                        cardTitle.setAttribute('class', 'card-title');
+                        tempEl.setAttribute('class', 'card-text');
+                        windEl.setAttribute('class', 'card-text');
+                        humidityEl.setAttribute('class', 'card-text');
+                        weatherIcon.setAttribute('src', iconUrl);
+                        tempEl.textContent = `Temp: ${temp} °F`;
+                        windEl.textContent = `Wind: ${windMph} MPH`;
+                        humidityEl.textContent = `Humidity: ${humidity} %`;
+                        col.append(card);
+                        card.append(cardBody);
+                        cardBody.append(cardTitle, weatherIcon, tempEl, windEl, humidityEl);
+                    
+                    
         
+                        fiveDay.innerHTML = "";
+                        fiveDay.append(card);
+
+                    });
+                                
+                            } )            //renderForecastCard(data);
+
+                            };
+                            
+                        
+                        
+                
 
 
 
@@ -132,67 +182,11 @@ dayjs.extend(window.dayjs_plugin_timezone);
         getSearchHistory();
       }
       
-    
+  
 
-    function renderForecastCard(data) {
-        
-            var startDt = dayjs().format('MM/DD/YYYY')+
-            console.log(startDt);
-            var endDt = startDt++;
-            console.log(endDt);
-            // variables for data from api
-           // var unixTs = dailyForecast.dt;
-            //var iconUrl = `https://openweathermap.org/img/w/${dailyForecast.weather.icon}.png`;
-            //var iconDescription = dailyForecast.weather.description;
-            
-            
-            var dailyTemp = data.temp;
-           
-            var humidity  = data.humidity;
-            var windMph = data.wind_speed;
-        
-            // Create elements for a card
-            var col = document.createElement('div');
-            var card = document.createElement('div');
-            var cardBody = document.createElement('div');
-            var cardTitle = document.createElement('h5');
-            var weatherIcon = document.createElement('img');
-            var tempEl = document.createElement('p');
-            var windEl = document.createElement('p');
-            var humidityEl = document.createElement('p');
-        
-            
-            
-            col.setAttribute('class', 'col-md');
-            col.classList.add('five-day-card');
-            card.setAttribute('class', 'card bg-primary h-100 text-white');
-            cardBody.setAttribute('class', 'card-body p-2');
-            cardTitle.setAttribute('class', 'card-title');
-            tempEl.setAttribute('class', 'card-text');
-            windEl.setAttribute('class', 'card-text');
-            humidityEl.setAttribute('class', 'card-text');
-                console.log(dailyTemp)
-            // Add content to elements
-            //cardTitle.textContent = dayjs.unix(unixTs).tz(timezone).format('M/D/YYYY');
-            //weatherIcon.setAttribute('src', iconUrl);
-            //weatherIcon.setAttribute('alt', iconDescription);
-            tempEl.textContent = `Temp: ${dailyTemp} °F`;
-            windEl.textContent = `Wind: ${windMph} MPH`;
-            humidityEl.textContent = `Humidity: ${humidity} %`;
-            futureDisplay.append(card);
-            card.append(cardBody);
-            cardBody.append(cardTitle, weatherIcon, tempEl, windEl, humidityEl);
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].dt >= startDt && data[i].dt < endDt) {
-                    renderForecastCard(data[i], timezone);
-                  }
-        
-      
-        futureDisplay.innerHTML = "";
-        futureDisplay.append(card);
 
-      }
-    }
+
+       
       
 
     
@@ -245,8 +239,8 @@ searchForm.addEventListener('submit', handleSearchFormSubmit);
 searchHistoryDisplay.addEventListener('click', handleSearchHistoryClick);
         
      
-  /*   }
-    getItems();
+
+  /*  getItems();
         function getItems() {
             
            var listHistory = JSON.parse(localStorage.getItem("searchHistory"));
@@ -267,9 +261,5 @@ searchHistoryDisplay.addEventListener('click', handleSearchHistoryClick);
             city = $(this).text();
             getData();
         });
-    };
-
-
 
 */
-
