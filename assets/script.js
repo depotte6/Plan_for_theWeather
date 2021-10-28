@@ -8,8 +8,6 @@ var todayDisplay = document.querySelector('#today');
 var searchHistoryDisplay = document.querySelector('#history');
 var fiveDay = document.querySelector('#future');
 
-
-
 dayjs.extend(window.dayjs_plugin_utc);
 dayjs.extend(window.dayjs_plugin_timezone);
 
@@ -54,18 +52,14 @@ function findWeather(search) {
             humidityEL.setAttribute("class", "card-text");
             humidityEL.textContent = `Humidity: ${humidity} %`;
 
-            var uvi = data.uvi;
-            var UVIndex = data.clouds.all;
-            console.log(UVIndex);
-            var uvEL = document.createElement("p");
-            var uvBadge = document.createElement("btn");
+
 
             weatherIcon = data.weather[0].icon;
             var iconUrl = `https://openweathermap.org/img/w/${data.weather[0].icon}.png`;
             var weatherIcon = document.createElement("img");
             weatherIcon.setAttribute("src", iconUrl);
 
-            cardBody.append(heading, weatherIcon, tempEL, windSpeedEL, humidityEL, uvBadge);
+            cardBody.append(heading, weatherIcon, tempEL, windSpeedEL, humidityEL);
             card.append(cardBody);
 
             todayDisplay.innerHTML = "";
@@ -78,12 +72,16 @@ function findWeather(search) {
             var apiUrl = `${weatherRootUrl}/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,current,alerts&units=imperial&appid=${APIKey}`;
 
             fetch(apiUrl)
-                .then((response) => {
-                    console.log(response);
-                    return response.json();
+                .then((data) => {
+                    console.log(data);
+                    return data.json()
 
                 })
-                .then((response) => {
+                .then((data) => {
+                    var uvi = data.daily[0].uvi;
+                    console.log(uvi);
+                    var uvEL = document.createElement("p");
+                    var uvBadge = document.createElement("btn");
                     uvEL.textContent = 'UV Index: ';
                     uvBadge.classList.add('btn', 'btn-sm');
 
@@ -130,94 +128,86 @@ function getFiveDayForecast(data) {
                 headingFive.setAttribute('class', 'col-12');
                 heading.textContent = '5 Day Forecast';
                 headingFive.append(heading);
-        
-                    var temp = data.daily[i].temp.day;
-                    var humidity  = data.daily[i].humidity;
-                    console.log(humidity);
-                    var windMph = data.daily[i].wind_speed;
-                    var weatherIcon = data.daily[i].weather[0].weatherIcon
-                    var iconUrl = `https://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`;
-                    var iconDescription = data.daily[i].weather[0].description
-                    var col = document.createElement('div');
-                    var card = document.createElement('div');
-                    var cardBody = document.createElement('div');
-                    var cardTitle = document.createElement('h5');
-                    var weatherIcon = document.createElement('img');
-                    var tempEl = document.createElement('p');
-                    var windEl = document.createElement('p');
-                    var humidityEl = document.createElement('p');
 
-                    col.append(card);
-                    card.append(cardBody);
-                    cardBody.append(cardTitle, weatherIcon, tempEl, windEl, humidityEl);
+                var temp = data.daily[i].temp.day;
+                var humidity = data.daily[i].humidity;
+                console.log(humidity);
+                var windMph = data.daily[i].wind_speed;
+                var weatherIcon = data.daily[i].weather[0].weatherIcon
+                var iconUrl = `https://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`;
+                var iconDescription = data.daily[i].weather[0].description
+                var col = document.createElement('div');
+                var card = document.createElement('div');
+                var cardBody = document.createElement('div');
+                var cardTitle = document.createElement('h5');
+                var weatherIcon = document.createElement('img');
+                var tempEl = document.createElement('p');
+                var windEl = document.createElement('p');
+                var humidityEl = document.createElement('p');
 
-                    col.setAttribute('class', 'col-md');
-                    col.classList.add('five-day-card');
-                    card.setAttribute('class', 'card bg-primary text-white');
-                    cardBody.setAttribute('class', 'card-body p-2');
-                    cardTitle.setAttribute('class', 'card-title');
-                    tempEl.setAttribute('class', 'card-text');
-                    windEl.setAttribute('class', 'card-text');
-                    humidityEl.setAttribute('class', 'card-text');
+                col.append(card);
+                card.append(cardBody);
+                cardBody.append(cardTitle, weatherIcon, tempEl, windEl, humidityEl);
 
-                    // Add content to elements
-                    cardTitle.textContent = dayjs().add(i, 'day').format('M/D/YYYY');
-                    weatherIcon.setAttribute('src', iconUrl);
-                    weatherIcon.setAttribute('alt', iconDescription);
-                    tempEl.textContent = `Temp: ${temp} °F`;
-                    windEl.textContent = `Wind: ${windMph} MPH`;
-                    humidityEl.textContent = `Humidity: ${humidity} %`;
+                col.setAttribute('class', 'col-md');
+                col.classList.add('five-day-card');
+                card.setAttribute('class', 'card bg-primary text-white');
+                cardBody.setAttribute('class', 'card-body p-2');
+                cardTitle.setAttribute('class', 'card-title');
+                tempEl.setAttribute('class', 'card-text');
+                windEl.setAttribute('class', 'card-text');
+                humidityEl.setAttribute('class', 'card-text');
 
-                    fiveDay.append(col);
-                }
-                fiveDay = '';
+                // Add content to elements
+                cardTitle.textContent = dayjs().add(i, 'day').format('M/D/YYYY');
+                weatherIcon.setAttribute('src', iconUrl);
+                weatherIcon.setAttribute('alt', iconDescription);
+                tempEl.textContent = `Temp: ${temp} °F`;
+                windEl.textContent = `Wind: ${windMph} MPH`;
+                humidityEl.textContent = `Humidity: ${humidity} %`;
 
-
-
-            });
-        };
-
-     
-
-        function handleSearchFormSubmit(e) {
-            if (!searchCityInput.value) {
-                return;
+                fiveDay.append(col);
             }
-        
-            e.preventDefault();
-            var search = searchCityInput.value.trim();
-            if (!searchHistoryList.includes(search)) {
-                searchHistoryList.push(search);
-                var searchedCity = document.createElement('button');
-                searchedCity.classList.add('history-btn');
-                searchedCity.textContent = search;
-                searchHistoryDisplay.append(searchedCity);
-            };
-            
-            localStorage.setItem("city", JSON.stringify(searchHistoryList));
-            console.log(searchHistoryList);
-            console.log(search);
-            searchCityInput.value = "";
-           
-            findWeather(search);
-  
+            fiveDay = '';
+
+
+
+        });
+};
+
+function handleSearchFormSubmit(e) {
+    if (!searchCityInput.value) {
+        return;
     }
-       
+
+    e.preventDefault();
+    var search = searchCityInput.value.trim();
+    if (!searchHistoryList.includes(search)) {
+        searchHistoryList.push(search);
+        var searchedCity = document.createElement('button');
+        searchedCity.classList.add('history-btn');
+        searchedCity.textContent = search;
+        searchHistoryDisplay.append(searchedCity);
+    };
+    
+    localStorage.setItem("city", JSON.stringify(searchHistoryList));
+    console.log(searchHistoryList);
+    console.log(search);
+    searchCityInput.value = "";
+   
+    findWeather(search);
+
+}
+
 function handleSearchHistoryClick(e) {
     if (!e.target.matches('.btn-history')) {
-      return;
+    return;
     }
     var btn = e.target;
     var search = btn.getAttribute('data-search');
     appendToHistory(search);
     findWeather(search);
-  }
-  
+}
 
 searchForm.addEventListener('submit', handleSearchFormSubmit);
 searchHistoryDisplay.addEventListener('click', handleSearchHistoryClick);
-
-
-
-
-           
